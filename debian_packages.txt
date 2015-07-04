@@ -1,0 +1,17 @@
+git
+nginx
+supervisor
+libboost-all-dev
+libtag1-dev
+zlib1g-dev
+build-essential
+python-dev
+libxml2-dev
+libxslt1-dev
+openjdk-6-jdk
+libbz2-dev
+sox
+rabbitmq-server
+redis-server
+libffi-dev
+libssl-dev

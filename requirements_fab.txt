@@ -1,0 +1,2 @@
+Fabric==1.8.0
+fabtools==0.15.0

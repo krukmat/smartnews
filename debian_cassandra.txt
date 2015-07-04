@@ -1,0 +1,5 @@
+oracle-java7-installer
+oracle-java7-set-default
+dsc21
+cassandra-tools
+opscenter
