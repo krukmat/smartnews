@@ -470,7 +470,7 @@ def django_manage(command, *args, **kwargs):
         str_args = ' '.join(args)
         str_kwargs = ' '.join(['%s=%s' % (k, v) for k, v in kwargs.items()])
         run('DJANGO_SETTINGS_MODULE="%s" python smartnews/django_app/manage.py %s %s %s' %
-                ("api.settings", command, str_args, str_kwargs))
+                ("django_app.settings", command, str_args, str_kwargs))
 
 @task
 def test(*args, **kwargs):
@@ -478,7 +478,7 @@ def test(*args, **kwargs):
         str_args = ' '.join(args)
         str_kwargs = ' '.join(['%s=%s' % (k, v) for k, v in kwargs.items()])
         run('DJANGO_SETTINGS_MODULE="%s" python smartnews/django_app/manage.py test %s %s' %
-                ("api.test_settings", str_args, str_kwargs))
+                ("django_app.settings", str_args, str_kwargs))
 
 @task
 def configure_cassandra():
