@@ -4,105 +4,67 @@ import scrapy
 from scraper_module.news_crawler.news_crawler import items
 
 
-class ClarinSpider(scrapy.Spider):
+class NewsSiteCrawler(scrapy.Spider):
+    name = 'newsite'
+
+    def parse(self, response):
+        item = items.NewsCrawlerItem()
+        item['page'] = self.name
+        item['content'] = u''
+        for style in self.styles:
+            for element in response.xpath(style):
+                item['content'] += "%s." % (element.extract(),)
+        item.materialize()
+        yield item
+
+
+class ClarinSpider(NewsSiteCrawler):
     name = "clarin"
 
     def __init__(self, *args, **kwargs):
         super(ClarinSpider, self).__init__(*args, **kwargs)
         self.start_urls = ["http://www.clarin.com"]
-
-    def parse(self, response):
-        item = items.NewsCrawlerItem()
-        item['page'] = self.name
-        item['content'] = u''
-        for element in response.xpath("//a/h3/text()"):
-            item['content'] += "%s." % (element.extract(),)
-        item.materialize()
-        yield item
+        self.styles = ["//a/h3/text()"]
 
 
-class PerfilSpider(scrapy.Spider):
+class PerfilSpider(NewsSiteCrawler):
     name = "perfil"
 
     def __init__(self, *args, **kwargs):
         super(PerfilSpider, self).__init__(*args, **kwargs)
         self.start_urls = ["http://www.perfil.com"]
+        self.styles = ["//h2/text()", "//h1/a/text()"]
 
-    def parse(self, response):
-        item = items.NewsCrawlerItem()
-        item['page'] = self.name
-        item['content'] = u''
-        for element in response.xpath("//h2/text()"):
-            item['content'] += "%s." % (element.extract(),)
-        for element in response.xpath("//h1/a/text()"):
-            item['content'] += "%s." % (element.extract(),)
-        item.materialize()
-        yield item
-
-
-class LaNacionSpider(scrapy.Spider):
+class LaNacionSpider(NewsSiteCrawler):
     name = "lanacion"
 
     def __init__(self, *args, **kwargs):
         super(LaNacionSpider, self).__init__(*args, **kwargs)
         self.start_urls = ["http://www.lanacion.com.ar"]
-
-    def parse(self, response):
-        item = items.NewsCrawlerItem()
-        item['page'] = self.name
-        item['content'] = u''
-        for element in response.xpath("//article/h2/a/text()"):
-            item['content'] += "%s." % (element.extract(),)
-        item.materialize()
-        yield item
+        self.styles = ["//article/h2/a/text()"]
 
 
-class Pagina12Spider(scrapy.Spider):
+class Pagina12Spider(NewsSiteCrawler):
     name = "pagina12"
 
     def __init__(self, *args, **kwargs):
         super(Pagina12Spider, self).__init__(*args, **kwargs)
         self.start_urls = ["http://www.pagina12.com.ar"]
+        self.styles = ["//table/tr/td/h3/a/text()"]
 
-    def parse(self, response):
-        item = items.NewsCrawlerItem()
-        item['page'] = self.name
-        item['content'] = u''
-        for element in response.xpath("//table/tr/td/h3/a/text()"):
-            item['content'] += "%s." % (element.extract(),)
-        item.materialize()
-        yield item
-
-
-class InfoBaeSpider(scrapy.Spider):
+class InfoBaeSpider(NewsSiteCrawler):
     name = "infobae"
 
     def __init__(self, *args, **kwargs):
         super(InfoBaeSpider, self).__init__(*args, **kwargs)
         self.start_urls = ["http://www.infobae.com"]
-
-    def parse(self, response):
-        item = items.NewsCrawlerItem()
-        item['page'] = self.name
-        item['content'] = u''
-        for element in response.xpath('//article/h1/a/text()'):
-            item['content'] += "%s." % (element.extract(),)
-        item.materialize()
-        yield item
+        self.styles = ['//article/h1/a/text()']
 
 
-class ElArgentinoSpider(scrapy.Spider):
+class ElArgentinoSpider(NewsSiteCrawler):
     name = "elargentino"
 
     def __init__(self, *args, **kwargs):
         super(ElArgentinoSpider, self).__init__(*args, **kwargs)
         self.start_urls = ["http://elargentino.infonews.com"]
-
-    def parse(self, response):
-        item = items.NewsCrawlerItem()
-        item['page'] = self.name
-        item['content'] = u''
-        for element in response.xpath('//h2/a/text()'):
-            item['content'] += "%s." % (element.extract(),)
-        item.materialize()
-        yield item
+        self.styles = ['//h2/a/text()']

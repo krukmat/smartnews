@@ -1,7 +1,7 @@
 import uuid
 from cassandra.cqlengine.models import Model
 from cassandra.cqlengine import columns
-from cassandra.cqlengine.management import sync_table, create_keyspace_simple
+from cassandra.cqlengine.management import sync_table
 from django.db import connections
 from datetime import datetime
 from cassandra.cqlengine import connection
