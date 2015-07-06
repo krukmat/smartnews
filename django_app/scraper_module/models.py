@@ -11,7 +11,7 @@ from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import NoHostAvailable
 
 
-class SiteNewsData(Model):
+class SiteNewsScrapedData(Model):
         created_at = columns.DateTime(default=datetime.now, index=True)
         id = columns.UUID(primary_key=True, default=uuid.uuid4)
         page = columns.Text(required=True, index=True)

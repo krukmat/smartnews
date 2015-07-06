@@ -15,3 +15,6 @@ rabbitmq-server
 redis-server
 libffi-dev
 libssl-dev
+libblas-dev
+liblapack-dev
+gfortran

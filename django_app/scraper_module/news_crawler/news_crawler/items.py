@@ -6,7 +6,7 @@
 # http://doc.scrapy.org/en/latest/topics/items.html
 
 import scrapy
-from scraper_module.models import SiteNewsData
+from scraper_module.models import SiteNewsScrapedData
 from scrapy.item import Item
 
 
@@ -16,10 +16,10 @@ class NewsCrawlerItem(Item):
 
     def materialize(self):
         try:
-            SiteNewsData.sync()
+            SiteNewsScrapedData.sync()
         except:
             pass
-        instance = SiteNewsData()
+        instance = SiteNewsScrapedData()
         instance.page = self['page']
         instance.content = self['content']
         instance.save()
