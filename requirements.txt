@@ -15,3 +15,5 @@ billiard==3.3.0.20
 service_identity==14.0.0
 gensim==0.11.1-1
 stop-words==2014.5.26
+nltk==3.0.3
+pattern==2.6

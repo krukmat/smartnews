@@ -390,6 +390,12 @@ def root_path():
 def install_python_modules():
     with project():
         fabtools.python.install_requirements('requirements.txt')
+    with root_path():
+        run(""" python -m nltk.downloader all""")
+
+@task
+def install_wikicorpus_es():
+    run('curl http://www.cs.upc.edu/~nlp/wikicorpus/tagged.es.tgz | tar xvz')
 
 
 def cassandra_sources():
@@ -459,6 +465,8 @@ def install():
     install_debian_packages()
     install_debian_cassandra()
     install_python_modules()
+    install_wikicorpus_es()
+    install_stop_words()
     configure_nginx()
     configure_redis()
     configure_cassandra()
@@ -496,6 +504,13 @@ def configure_cassandra():
         priority=1
     )
     fabtools.require.supervisor.process('cassandra', **kwargs)
+
+@task
+def install_stop_words():
+    #TODO: Should be in another place...
+    with cd('/home/vagrant/venv/lib/python2.7/site-packages/stop_words/'):
+        run("git clone https://github.com/Alir3z4/stop-words.git", quiet=True)
+
 
 @task
 def sync():

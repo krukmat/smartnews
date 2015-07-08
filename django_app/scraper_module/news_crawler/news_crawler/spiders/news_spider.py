@@ -13,7 +13,7 @@ class NewsSiteCrawler(scrapy.Spider):
         item['content'] = u''
         for style in self.styles:
             for element in response.xpath(style):
-                item['content'] += "%s." % (element.extract(),)
+                item['content'] += "%s ." % (element.extract(),)
         item.materialize()
         yield item
 

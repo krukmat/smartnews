@@ -163,6 +163,8 @@ NOSE_ARGS = ['--verbosity=2', '--with-coverage', '--cover-erase',
              '--cover-html', '--cover-html-dir=/vagrant/python-tests/',
              '--cover-package=web']
 
+STOP_WORDS_DIR = '/home/vagrant/stop_words/'
+
 import ssl
 from functools import wraps
 
@@ -176,3 +178,4 @@ def sslwrap(func):
     return bar
 
 ssl.wrap_socket = sslwrap(ssl.wrap_socket)
+os.environ.setdefault('STOP_WORDS_DIR','/home/vagrant/stop_words/')
