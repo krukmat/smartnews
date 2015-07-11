@@ -13,6 +13,8 @@ from scrapy.item import Item
 class NewsCrawlerItem(Item):
     page = scrapy.Field()
     content = scrapy.Field()
+    texts = scrapy.Field()
+    links = scrapy.Field()
 
     def materialize(self):
         try:
@@ -22,4 +24,6 @@ class NewsCrawlerItem(Item):
         instance = SiteNewsScrapedData()
         instance.page = self['page']
         instance.content = self['content']
+        for index, text in enumerate(self['texts']):
+            instance.map_link[text] = self['links'][index]
         instance.save()

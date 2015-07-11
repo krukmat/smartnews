@@ -179,3 +179,6 @@ def sslwrap(func):
 
 ssl.wrap_socket = sslwrap(ssl.wrap_socket)
 os.environ.setdefault('STOP_WORDS_DIR','/home/vagrant/stop_words/')
+
+from stop_words import get_stop_words
+STOP_WORDS = get_stop_words('spanish')
