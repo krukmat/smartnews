@@ -6,7 +6,7 @@ from django.db import connections
 from datetime import datetime
 from cassandra.cqlengine import connection
 from cassandra.cqlengine.connection import (
-    cluster as cql_cluster, session as cql_session)
+    cluster as cql_cluster, session as cql_session, execute)
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import NoHostAvailable
 from django.conf import settings
@@ -38,9 +38,20 @@ class SyncClass(object):
 class TopicGroups(Model, SyncClass):
     created_at = columns.DateTime(default=datetime.now, index=True)
     id = columns.UUID(primary_key=True, default=uuid.uuid4)
-    tags = columns.List(columns.Text)
-    links = columns.List(columns.Text)
-    relevance = columns.Integer(default=0)
+    tags = columns.List(columns.Text, index=True)
+    links = columns.List(columns.Text, index=True)
+    relevance = columns.Integer(default=0, index=True)
+
+
+    @classmethod
+    def all_tags(cls, tags):
+        cls.sync()
+        for tag in tags:
+            result = execute("SELECT count(*) FROM smartnews_dev.topic_groups WHERE tags CONTAINS '%s'" % (
+                tag.encode('utf-8'),))
+            if result[0]['count'] == 0:
+                return False
+        return True
 
 
 class SiteNewsScrapedData(Model, SyncClass):
