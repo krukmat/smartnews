@@ -9,10 +9,7 @@ from cassandra.cqlengine.connection import (
     cluster as cql_cluster, session as cql_session, execute)
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import NoHostAvailable
-from django.conf import settings
-
-from pattern.es import parse, split
-from utils import contains, cleanup
+from utils import contains, cleanup, only_nouns
 
 
 class SyncClass(object):
@@ -77,17 +74,9 @@ class SiteNewsScrapedData(Model, SyncClass):
             # Extract nouns, adjectives
             new_document = []
             for sentence in document_filtered:
-                new_sentence = []
-                structure = parse(sentence).split()
-                if structure:
-                    words = structure[0]
-                    for token in words:
-                        if token[0] not in settings.STOP_WORDS and \
-                            token[1] in [u'NN', u'NNS', u'NNP',
-                                        u'NNPS', u'FW', u'JJ', u'JJR', u'JJS']:
-                            new_sentence.append(token[0])
-                    if new_sentence:
-                        new_document.append(new_sentence)
+                new_sentence = only_nouns(sentence)
+                if new_sentence:
+                    new_document.append(new_sentence)
             # Remove empty lines and duplicate words from sentence
             texts = [list(set(sentence)) for sentence in new_document if sentence]
             # TODO: Reduce the matrix dimension to 2 x 2
@@ -100,8 +89,8 @@ class SiteNewsScrapedData(Model, SyncClass):
             for site in sites:
                 map = site.map_link
                 for key, link in map.iteritems():
-                    key = cleanup(key) # remving all not necessary chars
-                    if contains(tokens, key.split()):
+                    key = only_nouns(key) # remving all not necessary chars
+                    if contains(tokens, key):
                         return link
             return None
 

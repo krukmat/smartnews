@@ -12,6 +12,7 @@ def compute_topics():
     # Corpora
     dictionary = corpora.Dictionary(documents)
     corpus = [dictionary.doc2bow(text) for text in documents]
+    #TODO: Falla esto? Leer sobre como funca
     lsi = models.LsiModel(corpus, id2word=dictionary, num_topics=5)
     index = similarities.MatrixSimilarity(lsi[corpus])
     computed_corpus = []
