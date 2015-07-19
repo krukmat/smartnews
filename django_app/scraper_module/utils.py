@@ -4,11 +4,11 @@ from django.conf import settings
 from pattern.es import parse, split
 
 
-def contains(small, big):
+def contains_any(small, big):
     for element in small:
-        if element not in big:
-            return False
-    return True
+        if element in big:
+            return True
+    return False
 
 
 def cleanup(text):
@@ -31,5 +31,5 @@ def only_nouns(sentence):
             if token[0] not in settings.STOP_WORDS and \
                             token[1] in [u'NN', u'NNS', u'NNP',
                                          u'NNPS']:
-                new_sentence.append(token[0])
+                new_sentence.append(token[0].lower())
     return new_sentence

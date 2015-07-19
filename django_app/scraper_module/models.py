@@ -9,7 +9,7 @@ from cassandra.cqlengine.connection import (
     cluster as cql_cluster, session as cql_session, execute)
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import NoHostAvailable
-from utils import contains, cleanup, only_nouns
+from utils import contains_any, cleanup, only_nouns
 
 
 class SyncClass(object):
@@ -41,13 +41,11 @@ class TopicGroups(Model, SyncClass):
 
 
     @classmethod
-    def all_tags(cls, tags):
+    def contain_tag(cls, tag):
         cls.sync()
-        for tag in tags:
-            result = execute("SELECT count(*) FROM smartnews_dev.topic_groups WHERE tags CONTAINS '%s'" % (
-                tag.encode('utf-8'),))
-            if result[0]['count'] == 0:
-                return False
+        result = execute("SELECT count(*) FROM smartnews_dev.topic_groups WHERE tags CONTAINS '%s'" % (tag.encode('utf-8'),))
+        if result[0]['count'] == 0:
+            return False
         return True
 
 
@@ -83,15 +81,16 @@ class SiteNewsScrapedData(Model, SyncClass):
             return texts
 
         @classmethod
-        def find_sequence(cls, tokens):
+        def find_coincidences(cls, tokens):
             # search for the site object which contains all sequence of tokens
             sites = cls.objects.all()
+            coincidences = []
             for site in sites:
                 map = site.map_link
                 for key, link in map.iteritems():
                     key = only_nouns(key) # remving all not necessary chars
-                    if contains(tokens, key):
-                        return link
-            return None
+                    if contains_any(tokens, key):
+                        coincidences.append(link)
+            return coincidences
 
 

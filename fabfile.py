@@ -465,7 +465,7 @@ def install():
     install_debian_packages()
     install_debian_cassandra()
     install_python_modules()
-    install_wikicorpus_es()
+    # install_wikicorpus_es()
     install_stop_words()
     configure_nginx()
     configure_redis()

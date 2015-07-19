@@ -1,62 +1,63 @@
 __author__ = 'matiasleandrokruk'
 from gensim import corpora, models, similarities
 from models import *
+from pattern.vector import Document, Model as Model_Comp
+from pattern.es import parsetree
+from django.conf import settings
+
+
+def cleanup_topic():
+    TopicGroups.sync()
+    SiteNewsScrapedData.sync()
+    sites = SiteNewsScrapedData.objects.all()
+    for site in sites:
+        site.delete()
+    for topic in TopicGroups.objects.all():
+        topic.delete()
 
 
 def compute_topics():
+    # Based on similarity
+    # Based on words
     SiteNewsScrapedData.sync()
+    TopicGroups.sync()
     sites = SiteNewsScrapedData.objects.all()
-    documents = [site.tokens() for site in sites]
-    # reduce the matrix level
-    documents = [sentence for document in documents for sentence in document]
-    # Corpora
-    dictionary = corpora.Dictionary(documents)
-    corpus = [dictionary.doc2bow(text) for text in documents]
-    #TODO: Falla esto? Leer sobre como funca
-    lsi = models.LsiModel(corpus, id2word=dictionary, num_topics=5)
-    index = similarities.MatrixSimilarity(lsi[corpus])
-    computed_corpus = []
-    # Apply LSI
-    # TODO: Modelo custom (User? Config? BDA?)
-    for position, corp in enumerate(corpus):
-        if position not in computed_corpus:
-            vec_lsi = lsi[corp]
-            sims = index[vec_lsi]
-            # Descending ranking with the similar tokens
-            sims = sorted(enumerate(sims), key=lambda item: -item[1])
-            current_sequence = [dictionary[key] for key, ocurrence in corp]
-            # return all sentences and corpus which score > 0.95
-            similar_links = []
-            tokens = []
-            selecteds_tokens = []
-            for sentence, similarity in sims:
-                if similarity > 0.98 and sentence not in computed_corpus:
-                    selecteds_tokens.append(sentence)
-                    corp_sim = corpus[sentence]
-                    similar_sentence = [dictionary[key] for key, ocurrence in corp_sim]
-                    similar_news = SiteNewsScrapedData.find_sequence(similar_sentence)
-                    if similar_news:
-                        tokens.extend(similar_sentence)
-                        similar_links.append(similar_news)
-                    #else:
-                    #    raise IndexError('No news found with %s' % (similar_sentence))
-                else:
-                    break
-            # return all similar links in TopicGroup
-            similar_news = SiteNewsScrapedData.find_sequence(current_sequence)
-            if similar_news:
-                similar_links.append(similar_news)
-                tokens.extend(current_sequence)
-            # TODO: Count the number of similarities
-            # TODO: count the relevance of topic
-            try:
-                TopicGroups.sync()
-            except:
-                pass
-            tokens = list(set(tokens))
-            # Save topic group
-            if tokens and similar_links:
-                TopicGroups.create(tags=tokens, links=similar_links, relevance=len(selecteds_tokens))
-                # Remove all corpus linked
-                computed_corpus.extend(selecteds_tokens)
-    return corpus
+    documents = []
+    for site in sites:
+        for sentence in site.content.split('.'):
+            if sentence:
+                tree = parsetree(sentence, lemmata=True)
+                if len(tree) > 0:
+                    documents.append(tree[0])
+
+    documents = [[w.lemma for w in document if
+                  w.tag.startswith((u'NN', u'NNS', u'NNP', u'NNPS')) and w.lemma not in settings.STOP_WORDS] for
+                 document in documents]
+
+    documents = [Document(" ".join(document) + '.') for document in documents if len(document) > 1]
+    model = Model_Comp(documents=documents)
+
+    # format: (distribution, Document)
+    documents_analyzed = []
+    tokens = []
+    for document in documents:
+        similar_items_news = model.nearest_neighbors(document)
+        for similarity, sim_document in similar_items_news:
+            if sim_document.id not in documents_analyzed:
+                tokens.extend([word for word, _ in sim_document.words.iteritems()])
+                documents_analyzed.append(sim_document.id)
+        # Added is there some document similar
+        if document.id not in documents_analyzed:
+            tokens.extend([word for word, _ in document.words.iteritems()])
+            documents_analyzed.append(document.id)
+            # document_cluster.append(list(set(tokens)))
+    # complete_text = ".".join([" ".join(document) for document in document_cluster])
+    # TODO: Duplica tokens?
+    tokens = list(set(tokens))
+    for token in tokens:
+        links = SiteNewsScrapedData.find_coincidences([token])
+        # Filtrar solamente si tiene mas de 3 links
+        if len(links) > 3:
+            if not TopicGroups.contain_tag(token):
+                TopicGroups.create(tags=[token], links=links, relevance=len(links))
+    return True
