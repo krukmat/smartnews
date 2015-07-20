@@ -1,7 +1,7 @@
 import uuid
 from cassandra.cqlengine.models import Model
 from cassandra.cqlengine import columns
-from cassandra.cqlengine.management import sync_table
+from cassandra.cqlengine.management import sync_table, get_create_table, drop_table
 from django.db import connections
 from datetime import datetime
 from cassandra.cqlengine import connection
@@ -9,7 +9,7 @@ from cassandra.cqlengine.connection import (
     cluster as cql_cluster, session as cql_session, execute)
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import NoHostAvailable
-from utils import contains_any, cleanup, only_nouns
+from utils import contains_any, only_nouns
 
 
 class SyncClass(object):
@@ -30,20 +30,26 @@ class SyncClass(object):
             sync_table(cls)
         except NoHostAvailable:
             pass
+        except KeyError:
+            drop_table(cls)
+            get_create_table(cls)
 
 
-class TopicGroups(Model, SyncClass):
-    created_at = columns.DateTime(default=datetime.now, index=True)
+class ScrapedTopicGroups(Model, SyncClass):
+    created_dt = columns.DateTime(default=datetime.now, index=True)
     id = columns.UUID(primary_key=True, default=uuid.uuid4)
     tags = columns.List(columns.Text, index=True)
     links = columns.List(columns.Text, index=True)
     relevance = columns.Integer(default=0, index=True)
+    day = columns.Integer(index=True)
+    month = columns.Integer(index=True)
+    year = columns.Integer(index=True)
 
 
     @classmethod
     def contain_tag(cls, tag):
         cls.sync()
-        result = execute("SELECT count(*) FROM smartnews_dev.topic_groups WHERE tags CONTAINS '%s'" % (tag.encode('utf-8'),))
+        result = execute("SELECT count(*) FROM smartnews_dev.scraped_topic_groups WHERE tags CONTAINS '%s'" % (tag.encode('utf-8'),))
         if result[0]['count'] == 0:
             return False
         return True

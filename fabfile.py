@@ -457,9 +457,14 @@ def configure_redis():
     fabtools.require.supervisor.process('redis', **kwargs)
 
 @task
-def install():
+def update_repos():
     run('sudo add-apt-repository ppa:mc3man/trusty-media')
+    run('sudo add-apt-repository ppa:chris-lea/redis-server')
     run('sudo apt-get update')
+
+@task
+def install():
+    update_repos()
     install_git_repository()
     install_virtualenv()
     install_debian_packages()

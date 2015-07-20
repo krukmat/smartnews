@@ -11,6 +11,15 @@ def contains_any(small, big):
     return False
 
 
+def contains(small, big):
+    for i in xrange(len(big)-len(small)+1):
+        for j in xrange(len(small)):
+            if big[i+j] != small[j]:
+                break
+        else:
+            return i, i+len(small)
+    return False
+
 def cleanup(text):
     text = text.replace(',', ' ')
     text = text.replace(';', ' ')

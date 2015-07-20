@@ -1,4 +1,4 @@
-from celery.canvas import group
+from celery.canvas import group, chord
 from djcelery.app import app
 from news_crawler.news_crawler.utils import run_spider, spiders
 from nlp import *
@@ -11,10 +11,11 @@ def scrape_site(spider):
 
 @app.task
 def scrape_news():
-    cleanup_topic()
+    sites = SiteNewsScrapedData.objects.all()
+    for site in sites:
+        site.delete()
     # TODO: Pasar de alguna manera el transaction_id al spider
-    scraped_news = group(scrape_site.s(spider) for spider in spiders)
-    (scraped_news | compute_nlp.s())()
+    chord((scrape_site.s(spider) for spider in spiders), compute_nlp.s())()
     return True
 
 @app.task

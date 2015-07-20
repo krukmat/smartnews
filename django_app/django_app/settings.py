@@ -137,10 +137,13 @@ STATIC_URL = '/static/'
 # CELERY
 CELERY_ALWAYS_EAGER = False
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'
-CELERY_RESULT_BACKEND = 'redis://?new_join=1'
+# CELERY_RESULT_BACKEND = 'redis://?new_join=1'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_CHORD_PROPAGATES = True
 
 
 # Only add pickle to this list if your broker is secured
+CELERY_ACKS_LATE = False
 CELERY_ACCEPT_CONTENT = ['pickle']
 CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
@@ -152,6 +155,8 @@ CELERYD_LOG_FILE = '/var/log/scrapers.log'
 CELERYD_TASK_SOFT_TIME_LIMIT = 60 * 60 * 60  # 5 minutes
 CELERYD_TASK_TIME_LIMIT = CELERYD_TASK_SOFT_TIME_LIMIT + 10
 CELERYD_HIJACK_ROOT_LOGGER = False
+
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 
 #DISCOGS API CONSTANTS
 DISCOGS_PUBLIC_KEY = 'qraKoVdMtegdzntquyXkBXqjjRKaZArEKfUcRHly'

@@ -4,23 +4,37 @@ from models import *
 from pattern.vector import Document, Model as Model_Comp
 from pattern.es import parsetree
 from django.conf import settings
+from datetime import datetime
 
 
-def cleanup_topic():
-    TopicGroups.sync()
+def cleanup_topic(day, month, year):
+    ScrapedTopicGroups.sync()
     SiteNewsScrapedData.sync()
-    sites = SiteNewsScrapedData.objects.all()
-    for site in sites:
-        site.delete()
-    for topic in TopicGroups.objects.all():
+    for topic in ScrapedTopicGroups.objects.allow_filtering().filter(year=year).filter(month=month).filter(day=day):
         topic.delete()
+
+
+def reduce_topics():
+    # Check links are similar to any other topic. If it so => add the tag to that
+    # Do the links similarity checking
+    for topic in ScrapedTopicGroups.objects.all():
+        for topic2 in ScrapedTopicGroups.objects.all():
+            if topic != topic2 and len(topic.tags) == len(topic2.tags) \
+                    and topic.links == topic2.links:
+                # Tags Fusion
+                topic.tags.extend(topic2.tags)
+                topic.links = topic2.links
+                topic.save()
+                # Remove one of the topics
+                topic2.delete()
 
 
 def compute_topics():
     # Based on similarity
     # Based on words
-    SiteNewsScrapedData.sync()
-    TopicGroups.sync()
+    today = datetime.now()
+    cleanup_topic(today.day, today.month, today.year)
+    ScrapedTopicGroups.sync()
     sites = SiteNewsScrapedData.objects.all()
     documents = []
     for site in sites:
@@ -52,12 +66,13 @@ def compute_topics():
             documents_analyzed.append(document.id)
             # document_cluster.append(list(set(tokens)))
     # complete_text = ".".join([" ".join(document) for document in document_cluster])
-    # TODO: Duplica tokens?
     tokens = list(set(tokens))
     for token in tokens:
         links = SiteNewsScrapedData.find_coincidences([token])
         # Filtrar solamente si tiene mas de 3 links
         if len(links) > 3:
-            if not TopicGroups.contain_tag(token):
-                TopicGroups.create(tags=[token], links=links, relevance=len(links))
+            if not ScrapedTopicGroups.contain_tag(token):
+                ScrapedTopicGroups.create(tags=[token], links=links, relevance=len(links),
+                                   day=today.day, month=today.month, year=today.year)
+    reduce_topics()
     return True
