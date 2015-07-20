@@ -4,6 +4,13 @@ from django.conf import settings
 from pattern.es import parse, split
 
 
+def contains_all(small, big):
+    for element in small:
+        if not element in big:
+            return False
+    return True
+
+
 def contains_any(small, big):
     for element in small:
         if element in big:

@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 __author__ = 'matiasleandrokruk'
 from gensim import corpora, models, similarities
 from models import *
@@ -17,17 +19,8 @@ def cleanup_topic(day, month, year):
 def reduce_topics():
     # Check links are similar to any other topic. If it so => add the tag to that
     # Do the links similarity checking
-    for topic in ScrapedTopicGroups.objects.all():
-        for topic2 in ScrapedTopicGroups.objects.all():
-            if topic != topic2 and len(topic.tags) == len(topic2.tags) \
-                    and topic.links == topic2.links:
-                # Tags Fusion
-                topic.tags.extend(topic2.tags)
-                topic.links = topic2.links
-                topic.save()
-                # Remove one of the topics
-                topic2.delete()
-
+    # TODO: Reduce based on common words.
+    pass
 
 def compute_topics():
     # Based on similarity
@@ -53,26 +46,29 @@ def compute_topics():
 
     # format: (distribution, Document)
     documents_analyzed = []
-    tokens = []
     for document in documents:
+        tokens = []
         similar_items_news = model.nearest_neighbors(document)
         for similarity, sim_document in similar_items_news:
-            if sim_document.id not in documents_analyzed:
+            if similarity > 0.95 and sim_document.id not in documents_analyzed:
                 tokens.extend([word for word, _ in sim_document.words.iteritems()])
                 documents_analyzed.append(sim_document.id)
         # Added is there some document similar
         if document.id not in documents_analyzed:
             tokens.extend([word for word, _ in document.words.iteritems()])
             documents_analyzed.append(document.id)
-            # document_cluster.append(list(set(tokens)))
-    # complete_text = ".".join([" ".join(document) for document in document_cluster])
-    tokens = list(set(tokens))
-    for token in tokens:
-        links = SiteNewsScrapedData.find_coincidences([token])
-        # Filtrar solamente si tiene mas de 3 links
-        if len(links) > 3:
-            if not ScrapedTopicGroups.contain_tag(token):
-                ScrapedTopicGroups.create(tags=[token], links=links, relevance=len(links),
-                                   day=today.day, month=today.month, year=today.year)
-    reduce_topics()
+        # filter the most relevant words (based on count)
+        counter = defaultdict(int)
+        for token in tokens:
+            counter[token] += 1
+        # Order counter desc
+        tokens_org = sorted(counter.items(), key=lambda element: element[1], reverse=True)
+        tokens = [token for token, count in tokens_org[:3]]
+        if tokens and len(tokens) > 0:
+            links = SiteNewsScrapedData.find_coincidences(tokens)
+            # Filtrar solamente si tiene mas de 3 links
+            if len(links) > 3:
+                ScrapedTopicGroups.create(tags=tokens, links=links, relevance=len(links),
+                                        day=today.day, month=today.month, year=today.year)
+    #reduce_topics()
     return True
