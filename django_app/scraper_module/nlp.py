@@ -16,11 +16,23 @@ def cleanup_topic(day, month, year):
         topic.delete()
 
 
-def reduce_topics():
+def reduce_topics(day, month, year):
     # Check links are similar to any other topic. If it so => add the tag to that
     # Do the links similarity checking
-    # TODO: Reduce based on common words.
-    pass
+    for topic in ScrapedTopicGroups.objects.allow_filtering().filter(year=year).filter(month=month).filter(day=day):
+        for topic2 in ScrapedTopicGroups.objects.allow_filtering().filter(year=year).filter(month=month).filter(day=day):
+            if topic != topic2:
+                tags1_set = set(topic.tags)
+                tags2_set = set(topic2.tags)
+                if not tags2_set.isdisjoint(tags1_set):
+                    # Elements in common
+                    topic.tags = list(tags1_set.intersection(tags2_set))
+                    links1_set = set(topic.links)
+                    links2_set = set(topic2.links)
+                    topic.links = list(links1_set.intersection(links2_set))
+                    topic.save()
+                    topic2.delete()
+
 
 def compute_topics():
     # Based on similarity
@@ -70,5 +82,5 @@ def compute_topics():
             if len(links) > 3:
                 ScrapedTopicGroups.create(tags=tokens, links=links, relevance=len(links),
                                         day=today.day, month=today.month, year=today.year)
-    #reduce_topics()
+    reduce_topics(today.day, today.month, today.year)
     return True
