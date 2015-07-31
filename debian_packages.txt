@@ -18,3 +18,5 @@ libssl-dev
 libblas-dev
 liblapack-dev
 gfortran
+nodejs
+npm

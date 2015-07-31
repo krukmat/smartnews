@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 __author__ = 'matiasleandrokruk'
-from gensim import corpora, models, similarities
 from models import *
 from pattern.vector import Document, Model as Model_Comp
 from pattern.es import parsetree

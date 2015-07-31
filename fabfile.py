@@ -6,6 +6,7 @@ from fabric.api import (
     cd, run as _run, task, env, hide, sudo as _sudo
 )
 from fabric.colors import red, green, blue, yellow
+from fabric.context_managers import prefix
 from fabric.operations import require as require_env, open_shell
 from fabric.contrib.files import exists
 import fabtools
@@ -516,6 +517,76 @@ def install_stop_words():
     with cd('/home/vagrant/venv/lib/python2.7/site-packages/stop_words/'):
         run("git clone https://github.com/Alir3z4/stop-words.git", quiet=True)
 
+
+@task
+def install_rvm():
+    """
+    Install rvm
+    """
+    require_env('ruby_version')
+    run('gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3')
+    run('curl -L https://get.rvm.io | bash -s stable')
+
+    if not exists('~/.rvm/'):
+        run('ln -sd /usr/local/rvm ~/.rvm')
+
+    run('source ~/.rvm/scripts/rvm')
+    run('rvm install %s' % env.ruby_version)
+
+@task
+def install_nodeenv():
+    """
+    Install nodeenv
+    """
+    require_env('nodeenv_path')
+
+    nodejs_path = '/usr/bin/nodejs'
+    node_path = '/usr/bin/node'
+    # if not exists(node_path):
+    #    sudo('ln -s %s %s' % (nodejs_path, node_path))
+
+    if exists(env.nodeenv_path):
+        run('rm -r %s' % env.nodeenv_path)
+
+    with project():
+        run('nodeenv --node=system %s' % env.nodeenv_path)
+
+@contextmanager
+def rvm():
+    """Runs commands within rvm."""
+    require_env('ruby_version')
+    with nested(prefix("source ~/.rvm/scripts/rvm"),
+                prefix('rvm %s' % env.ruby_version)):
+        yield
+
+@contextmanager
+def nodeenv():
+    """Runs commands within nodeenv."""
+    require_env('nodeenv_path')
+
+    with nested(prefix("source %s/bin/activate" % env.nodeenv_path)):
+        yield
+
+@task
+def install_app_requirements():
+    with nodeenv():
+        run('npm install -g gulp bower')
+
+@task
+def install_compass():
+    """
+    Install compass
+    """
+    with rvm():
+        run('gem update --system')
+        run('gem install compass')
+
+@task
+def install_frontend():
+    install_rvm()
+    install_nodeenv()
+    install_compass()
+    install_app_requirements()
 
 @task
 def sync():
