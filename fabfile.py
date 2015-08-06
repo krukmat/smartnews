@@ -39,7 +39,7 @@ env.python = 'python'
 env.virtualenv_path = os.path.join('venv')
 env.nodeenv_path = os.path.join('~', 'nenv')
 env.project_path = os.path.join('/home/vagrant', env.project_name)
-env.project_wsgi = '.'.join(['django_app', 'django_app'])
+env.project_wsgi = 'django_app'
 
 env.django_static_url = '/static/'
 env.django_static_root = os.path.join(env.project_path, 'static/')

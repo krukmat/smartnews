@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from web_module.views import *
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^$', home, name='home'),
+    url(r'^topic/(?P<tag_id>[^/]+)$', topic, name='topic')
 ]
