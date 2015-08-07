@@ -5,7 +5,9 @@
     <title></title>
 </head>
 <body>
-    {{topic.tag}}
-    {{topic.links}}
+    <h2>{{topic.tag}}</h2>
+    {% for link in topic.links %}
+        <a href="{{link}}">{{link}}</a></br>
+    {% endfor %}
 </body>
 </html>

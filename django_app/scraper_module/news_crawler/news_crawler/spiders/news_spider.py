@@ -2,6 +2,10 @@
 
 import scrapy
 from scraper_module.news_crawler.news_crawler import items
+import urlparse
+
+def is_absolute(url):
+    return bool(urlparse.urlparse(url).netloc)
 
 
 class NewsSiteCrawler(scrapy.Spider):
@@ -32,7 +36,10 @@ class NewsSiteCrawler(scrapy.Spider):
                 if text and link:
                     item['content'] += "%s ." % (text.extract(),)
                     item['texts'].append(text.extract().encode('utf-8'))
-                    item['links'].append(link.extract().encode('utf-8'))
+                    link = link.extract().encode('utf-8')
+                    if not is_absolute(link):
+                        link = "%s/%s" % (self.start_urls[0], link)
+                    item['links'].append(link)
         item.materialize()
         yield item
 
@@ -81,8 +88,11 @@ class ClarinSpider(NewsSiteCrawler):
                             link = None
                 if text and link:
                     item['content'] += "%s ." % (text.extract(),)
+                    link = link.extract().encode('utf-8')
+                    if not is_absolute(link):
+                        link = "%s/%s" % (self.start_urls[0], link)
                     item['texts'].append(text.extract().encode('utf-8'))
-                    item['links'].append(link.extract().encode('utf-8'))
+                    item['links'].append(link)
         item.materialize()
         yield item
 
