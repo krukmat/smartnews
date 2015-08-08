@@ -6,7 +6,9 @@ Web platform which allows the users to 'scrape' from their favorite news site an
 Server:
 ------
 * Install vagrant
-* In project's folder: sudo vagrant init. Then: sudo fab vagrant install.
+* In project's folder:
+            - sudo vagrant init.
+            - sudo fab vagrant install.
 
 Then you can call the task that creates the topics:
 ```
