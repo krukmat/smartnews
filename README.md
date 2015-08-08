@@ -1,6 +1,5 @@
-# johnnie.b.goo
-A cool app to get information from audio file to music data. Also the possibility to hook to different APIs
-
+# smartnews: The highway to the hell for the news
+Web platform which allows the users to 'scrape' from their favorite news site and have a refined landscape for everyday hot topics.
 # How to use it locally? (Linux - Mac)
 * git clone or download project.
 
@@ -11,14 +10,8 @@ Server:
 * sudo fab vagrant install
 
 
-Google Chrome Extension:
------------------------
-* Open Chrome Browser
-* Window -> Extensions -> Load Unpacked Extension -> /project_path/johnnie.b.goo/chrome-extension
-* You'll see a cool guitar in your toolbar ;)
+Then you can call this task:
+from scraper_module.tasks import scrape_news
+scrape_news.delay()
 
-
-Architecture:
-------------
-![alt tag](https://raw.github.com/krukmat/johnnie.b.goo/master/docs/architecture.png)
-![alt tag](https://raw.github.com/krukmat/johnnie.b.goo/master/docs/architecture2.png)
+The web module is still on development. But idea is user can signup, select the scrapers he wants and the user will have the news in a tag cloud format with all the sites related to every topic
