@@ -7,8 +7,8 @@ Server:
 ------
 * Install vagrant
 * In project's folder:
-            * sudo vagrant init.
-            * sudo fab vagrant install.
+1. sudo vagrant init.
+2. sudo fab vagrant install.
 
 Then you can call the task that creates the topics:
 ```
