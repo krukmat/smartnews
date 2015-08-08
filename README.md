@@ -1,4 +1,4 @@
-# smartnews: The highway to the hell for the news
+# Smartnews: The highway to hell for the news
 Web platform which allows the users to 'scrape' from their favorite news site and have a refined landscape for everyday hot topics.
 # How to use it locally? (Linux - Mac)
 * git clone or download project.
