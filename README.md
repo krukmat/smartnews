@@ -21,9 +21,9 @@ But idea is user can signup, select the scrapers he wants and the user will have
 ROAD MAP:
 --------
 
-0.1: Simple version with everyday hot-topic
-0.2: Multiuser support. User can select in a list of predefined scrapers.
-0.3: User can create 'alarms' looking for some concepts or topics.
-0.4: User can create its own scrapers.
-0.5: Integration with social networks.
-0.6: Integration with blog services (widget creation)
+* 0.1: Simple version with everyday hot-topic
+* 0.2: Multiuser support. User can select in a list of predefined scrapers.
+* 0.3: User can create 'alarms' looking for some concepts or topics.
+* 0.4: User can create its own scrapers.
+* 0.5: Integration with social networks.
+* 0.6: Integration with blog services (widget creation)
