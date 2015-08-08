@@ -14,7 +14,7 @@ Then you can call the task that creates the topics:
 ```
 from scraper_module.tasks import scrape_news
 scrape_news.delay()
-``
+```
 The web module is still on development.
 But idea is user can signup, select the scrapers he wants and the user will have the news in a tag cloud format with all the sites related to every topic
 
