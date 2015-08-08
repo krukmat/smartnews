@@ -6,9 +6,7 @@ Web platform which allows the users to 'scrape' from their favorite news site an
 Server:
 ------
 * Install vagrant
-* sudo fab vagrant init
-* sudo fab vagrant install
-
+* In project's folder: sudo vagrant init. Then: sudo fab vagrant install.
 
 Then you can call the task that creates the topics:
 ```
@@ -28,3 +26,4 @@ ROAD MAP:
 * 0.4: User can create its own scrapers.
 * 0.5: Integration with social networks.
 * 0.6: Integration with blog services (widget creation)
+* 0.7: Migration to AngularJS. API Generation
