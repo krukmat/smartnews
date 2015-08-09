@@ -3,9 +3,10 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>SmartNews</title>
+    <link rel="stylesheet" type="text/css" href="/static/jqcloud.css" />
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script type="text/javascript" src="/static/tagcloud.jquery.min.js"></script>
-    <script type="text/javascript" src="/static/jquery.hotag.min.js"></script>
+
 <style>
        * {
             resize: none;
@@ -16,24 +17,7 @@
             margin: 0px;
             list-style-type: none;
         }
-        .hotag-container {
-            width: 100%;
-            font-family: arial,helvetica,clean,sans-serif;
-            font-size: 13px;
-            font-weight: normal;
-            padding: 10px 0;
-            float: left;
-        }
-        .hotag-container a {
-            margin: 5px 3px;
-            color: #0099d2;
-            text-decoration: none;
-            float: left;
-        }
-        .hotag-container a:hover {
-            text-decoration: underline;
-        }
-    </style>
+</style>
 
 
 <script type="text/javascript">
@@ -65,25 +49,14 @@
     };
     $(document).ready(function(){
         $('#tagcloud').tagoSphere(settings);
-        var tags = [
-        {% for topic in topics %}
-                 {% for tag in topic.tags %}
-                        {counts:1, tag:"{{tag}}", href:"/topic/{{topic.pk}}"},
-                 {% endfor %}
-        {% endfor %}
-        ];
-        $('#container').hotag({tags: tags});
     });
 </script>
 </head>
 <body>
-    <div id="container"></div>
     <div id="tagcloud">
         <ul>
              {% for topic in topics %}
-                 {% for tag in topic.tags %}
-                     <li><a href="/topic/{{topic.pk}}">{{tag}}</a></li>
-                 {% endfor %}
+                 <li><a href="/topic/{{topic.pk}}">{{ topic.tags|join:" " }}</a></li>
              {% endfor %}
         </ul>
     </div>
