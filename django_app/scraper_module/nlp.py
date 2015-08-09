@@ -5,7 +5,6 @@ from models import *
 from pattern.vector import Document, Model as Model_Comp
 from pattern.es import parsetree
 from django.conf import settings
-from datetime import datetime
 
 
 def cleanup_topic(day, month, year):
@@ -33,10 +32,9 @@ def reduce_topics(day, month, year):
                     topic2.delete()
 
 
-def compute_topics():
+def compute_topics(set_reduce_topics, today):
     # Based on similarity
     # Based on words
-    today = datetime.now()
     cleanup_topic(today.day, today.month, today.year)
     ScrapedTopicGroups.sync()
     sites = SiteNewsScrapedData.objects.all()
@@ -81,5 +79,6 @@ def compute_topics():
             if len(links) > 3:
                 ScrapedTopicGroups.create(tags=tokens, links=links, relevance=len(links),
                                         day=today.day, month=today.month, year=today.year)
-    reduce_topics(today.day, today.month, today.year)
+    if set_reduce_topics:
+        reduce_topics(today.day, today.month, today.year)
     return True

@@ -2,6 +2,7 @@ from celery.canvas import group, chord
 from djcelery.app import app
 from news_crawler.news_crawler.utils import run_spider, spiders
 from nlp import *
+from datetime import datetime
 
 
 @app.task
@@ -20,5 +21,6 @@ def scrape_news():
 
 @app.task
 def compute_nlp(results):
-    compute_topics()
+    today = datetime.now()
+    compute_topics(True, today)
     return True
