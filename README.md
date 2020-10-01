@@ -1,7 +1,7 @@
 # Smartnews: The highway to hell for news
 Web platform which allows the users to 'scrape' from their favorite news site and have a refined landscape for everyday hot topics.
 # How to use it locally? (Linux - Mac)
-* git clone or download project.
+* git clone or easily download project in Zip format.
 
 Server:
 ------
