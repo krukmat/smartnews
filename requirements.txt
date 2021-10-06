@@ -10,7 +10,7 @@ mock==1.0.1
 django-nose==1.4
 django-cassandra-engine==0.3.3
 coverage==4.0a5
-scrapy==1.0.1
+scrapy==1.8.1
 billiard==3.3.0.20
 service_identity==14.0.0
 gensim==0.11.1-1
