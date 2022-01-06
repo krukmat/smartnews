@@ -3,7 +3,7 @@ ipdb==0.8
 uwsgi==2.0.10
 beautifulsoup4==4.3.2
 requests==2.20.0
-celery==3.1.17
+celery==5.2.2
 django-celery==3.1.16
 redis==2.10.3
 mock==1.0.1
